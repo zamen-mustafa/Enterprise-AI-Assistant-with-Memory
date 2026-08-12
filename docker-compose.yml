@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    ports: ["8501:8501"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://enterprise:enterprise@postgres:5432/enterprise_ai
+      REDIS_URL: redis://redis:6379/0
+    volumes: ["./data:/app/data"]
+    depends_on: [postgres, redis]
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: enterprise_ai
+      POSTGRES_USER: enterprise
+      POSTGRES_PASSWORD: enterprise
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: ["redis_data:/data"]
+volumes:
+  postgres_data:
+  redis_data:
